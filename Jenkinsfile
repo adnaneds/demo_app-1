@@ -23,6 +23,46 @@ pipeline {
             }
         }
 
+        stage('Style analysis: PEP8') {
+            steps {
+                ToxEnvRun('pep8')
+            }
+            post {
+                always {
+                    recordIssues(tools: [flake8(pattern: 'flake8.log')])
+                }
+            }
+        }
+
+//         stage('Unit testing coverage') {
+//             steps {
+//                 ToxEnvRun('cover')
+//                 ToxEnvRun('cobertura')
+//             }
+//             post {
+//                 success {
+//                     HTMLReport('cover', 'index.html', 'coverage.py report')
+//                     CoberturaReport('**/coverage.xml')
+//                 }
+//             }
+//         }
+//
+//         stage('Security scanner') {
+//             steps {
+//                 ToxEnvRun('bandit-report')
+//                 script {
+//                     if (currentBuild.result == 'FAILURE') {
+//                         currentBuild.result = 'UNSTABLE'
+//                     }
+//                }
+//             }
+//             post {
+//                always {
+//                     HTMLReport("/tmp/bandit", 'index.html', 'Bandit report')
+//                 }
+//             }
+//         }
+
         stage("Re-build Docker images") {
             when {
                 anyOf {
