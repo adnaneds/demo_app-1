@@ -63,21 +63,21 @@ pipeline {
 //             }
 //         }
 
-        stage("Re-build Docker images") {
-            when {
-                anyOf {
-                   branch 'master'
-                   branch 'test'
-                   buildingTag()
-               }
-            }
-            steps {
-                script {
-                    def job_result = JenkinsBuildJob("${env.job_location}")
-                    job_result_url = job_result.absoluteUrl
-                }
-            }
-        }
+//         stage("Re-build Docker images") {
+//             when {
+//                 anyOf {
+//                    branch 'master'
+//                    branch 'test'
+//                    buildingTag()
+//                }
+//             }
+//             steps {
+//                 script {
+//                     def job_result = JenkinsBuildJob("${env.job_location}")
+//                     job_result_url = job_result.absoluteUrl
+//                 }
+//             }
+//         }
 
     }
 }
