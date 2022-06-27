@@ -1,7 +1,7 @@
 Demo App
 ========
 
-[![Build Status](https://jenkins.indigo-datacloud.eu/buildStatus/icon?job=Pipeline-as-code/DEEP-OC-org/demo_app/master)](https://jenkins.indigo-datacloud.eu/job/Pipeline-as-code/job/DEEP-OC-org/job/demo_app/job/master)
+[![Build Status](https://jenkins.indigo-datacloud.eu/buildStatus/icon?job=Pipeline-as-code/DEEP-OC-org/demo_app/return-files)](https://jenkins.indigo-datacloud.eu/job/Pipeline-as-code/job/DEEP-OC-org/job/demo_app/job/return-files)
 
 A _minimal_ toy application for demo and testing purposes. We just implemented dummy inference, ie. we return the same inputs we are fed. If some input is not fed we generate a default one.
 
@@ -22,5 +22,3 @@ The two branches in this repo cover the two main usecases:
      - long responses (that could better fit better in a `txt` file), 
      - media files (eg. returning an image),
      - multiple files (for example returning an image and a text file at the same time, packing them into a zip file).
-
-> TODO: Add one more branch with tox tests, to test Jenkisnfile functionality.
