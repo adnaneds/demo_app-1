@@ -66,61 +66,111 @@ def get_metadata():
 
 def get_predict_args():
     """
-    Input fields for the user.
+    TODO: add more dtypes
+    * int with choices
+    * composed: list of strs, list of int
     """
+    # WARNING: missing!=None has to go with required=False
     arg_dict = {
+        "demo-str": fields.Str(
+            required=False,
+            missing='some-string',
+        ),
+        "demo-str-choice": fields.Str(
+            required=False,
+            missing='choice2',
+            enum=["choice1", "choice2"],
+        ),
+        "demo-int": fields.Int(
+            required=False,
+            missing=1,
+        ),
+        "demo-int-range": fields.Int(
+            required=False,
+            missing=50,
+            validate=[validate.Range(min=1, max=100)]
+        ),
+        "demo-float": fields.Float(
+            required=False,
+            missing=0.1,
+        ),
+        "demo-bool": fields.Bool(
+            required=False,
+            missing=True,
+        ),
+        "demo-dict": fields.Str(  # dicts have to be processed as strings
+            required=False,
+            missing='{"a": 0, "b": 1}',  # use double quotes inside dict
+        ),
+        "demo-list-of-floats": fields.List(
+            fields.Float(),
+            required=False,
+            missing=[0.1, 0.2, 0.3],
+        ),
         "demo-image": fields.Field(
             required=False,
             type="file",
             location="form",
             description="image",  # needed to be parsed by UI
         ),
-        # Add format type of the response of predict()
-        # For demo purposes, we allow the user to receive back
-        # either an image or a zip containing an image.
-        # More options for MIME types: https://mimeapplication.net/
-        "accept": fields.Str(
-            description="Media type(s) that is/are acceptable for the response.",
-            validate=validate.OneOf(["image/*", "application/zip"]),
+        "demo-audio": fields.Field(
+            required=False,
+            type="file",
+            location="form",
+            description="audio",  # needed to be parsed by UI
+        ),
+        "demo-video": fields.Field(
+            required=False,
+            type="file",
+            location="form",
+            description="video",  # needed to be parsed by UI
         ),
     }
+
     return arg_dict
 
-from PIL import Image
 
 @_catch_error
 def predict(**kwargs):
     """
-    Return same inputs as provided.
+    Return same inputs as provided. We also add additional fields
+    to test the functionality of the Gradio-based UI [1].
+       [1]: https://github.com/deephdc/deepaas_ui
     """
-    filepath = kwargs['demo-image'].filename
+    # Dict are fed as str so have to be converted back
+    kwargs['demo-dict'] = json.loads(kwargs['demo-dict'])
 
-    # Return the image directly
-    if kwargs['accept'] == 'image/*':
-        
-        #return open(filepath, 'rb')
-        
-        img = Image.open(filepath)
-        img.show()
-        return img
-    
-    
-    
-    # Return a zip
-    elif kwargs['accept'] == 'application/zip':
+    # Add labels and random probalities to output as mock
+    prob = [random() for _ in range(5)]
+    kwargs['probabilities'] = [i / sum(prob) for i in prob]
+    kwargs['labels'] = ['class2', 'class3', 'class0', 'class1', 'class4']
 
-        zip_dir = tempfile.TemporaryDirectory()
+    # Read media files and return them back in base64
+    for k in ['demo-image', 'demo-audio', 'demo-video']:
+        with open(kwargs[k].filename, 'rb') as f:
+            media = f.read()
+        media = base64.b64encode(media)  # bytes
+        kwargs[k] = media.decode('utf-8')  # string (in utf-8)
 
-        # Add original image to output zip
-        shutil.copyfile(filepath,
-                        zip_dir.name + '/demo.png')
+    return kwargs
 
-        # Add for example a demo txt file
-        with open(f'{zip_dir.name}/demo.txt', 'w') as f:
-            f.write('Add here any additional information!')
 
-        # Pack dir into zip and return it
-        shutil.make_archive(zip_dir.name, format='zip', root_dir=zip_dir.name)
-        zip_path = zip_dir.name + '.zip'
-
-        return open(zip_path, 'rb')
+# Schema to validate the `predict()` output
+schema = {
+    "demo-str": fields.Str(),
+    "demo-str-choice": fields.Str(),
+    "demo-int": fields.Int(),
+    "demo-int-range": fields.Int(),
+    "demo-float": fields.Float(),
+    "demo-bool": fields.Bool(),
+    "demo-dict": fields.Dict(),
+    "demo-list-of-floats": fields.List(fields.Float()),
+    "demo-image": fields.Str(
+        description='image'),  # needed to be parsed by UI
+    "demo-audio": fields.Str(
+        description='audio'),  # needed to be parsed by UI
+    "demo-video": fields.Str(
+        description='video'),  # needed to be parsed by UI
+    "labels": fields.List(fields.Str()),
+    "probabilities": fields.List(fields.Float()),
+}
