@@ -72,59 +72,13 @@ def get_predict_args():
     """
     # WARNING: missing!=None has to go with required=False
     arg_dict = {
-        "demo-str": fields.Str(
-            required=False,
-            missing='some-string',
-        ),
-        "demo-str-choice": fields.Str(
-            required=False,
-            missing='choice2',
-            enum=["choice1", "choice2"],
-        ),
-        "demo-int": fields.Int(
-            required=False,
-            missing=1,
-        ),
-        "demo-int-range": fields.Int(
-            required=False,
-            missing=50,
-            validate=[validate.Range(min=1, max=100)]
-        ),
-        "demo-float": fields.Float(
-            required=False,
-            missing=0.1,
-        ),
-        "demo-bool": fields.Bool(
-            required=False,
-            missing=True,
-        ),
-        "demo-dict": fields.Str(  # dicts have to be processed as strings
-            required=False,
-            missing='{"a": 0, "b": 1}',  # use double quotes inside dict
-        ),
-        "demo-list-of-floats": fields.List(
-            fields.Float(),
-            required=False,
-            missing=[0.1, 0.2, 0.3],
-        ),
         "demo-image": fields.Field(
             required=False,
             type="file",
             location="form",
             description="image",  # needed to be parsed by UI
         ),
-        "demo-audio": fields.Field(
-            required=False,
-            type="file",
-            location="form",
-            description="audio",  # needed to be parsed by UI
-        ),
-        "demo-video": fields.Field(
-            required=False,
-            type="file",
-            location="form",
-            description="video",  # needed to be parsed by UI
-        ),
+
     }
 
     return arg_dict
