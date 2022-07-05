@@ -86,6 +86,7 @@ def get_predict_args():
     }
     return arg_dict
 
+from PIL import Image
 
 @_catch_error
 def predict(**kwargs):
@@ -96,8 +97,15 @@ def predict(**kwargs):
 
     # Return the image directly
     if kwargs['accept'] == 'image/*':
-        return open(filepath, 'rb')
-
+        
+        #return open(filepath, 'rb')
+        
+        img = Image.open(filepath)
+        img.show()
+        return img
+    
+    
+    
     # Return a zip
     elif kwargs['accept'] == 'application/zip':
 
